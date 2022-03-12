@@ -177,10 +177,25 @@ declare -i counter=0; while getopts ":l:i:p:h:c:" arg; do
 done
 
 if [[ $counter -eq 3 ]]; then
-	if [ $code ]; then
-		encoding
+	which xclip > /dev/null 2>&1
+	if [ $(echo $?) == 0 ]; then
+		if [ $code ]; then
+			encoding
+		else
+			mainScript
+		fi
 	else
-		mainScript
+		banner
+		echo -e "\n${redColour}[!]${endColour} ${grayColour}Falta la herramienta xclip${endColour}"
+		echo -e "    ${grayColour}Instalando la herramienta...${endColour}"
+		sudo apt install xclip -y > /dev/null 2>&1
+		which xclip > /dev/null 2>&1
+		if [ $(echo $?) == 0 ]; then
+			echo -e "\n${redColour}[*]${endColour} ${grayColour}Ya se ha instalado la herramienta, vuelve a ejecutar el programa${grayColour}"
+		else
+			echo -e "\n${redColour}[!]${endColour} ${grayColour}La instalación ha fallado, intenta instalarlo manualmente con el comando:${grayColour}"
+			echo -e "${yellowColour}    sudo apt install xclip${endColour}"
+		fi
 	fi
 else
 	helpPanel
