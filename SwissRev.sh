@@ -121,7 +121,7 @@ function encoding(){
 		encode=$(echo $shell | base64)
 		echo -e "${redColour}[*] ${endColour}${grayColour}Reverse Shell (base64) ${endColour}${redColour}-> ${endColour}${yellowColour}$encode${endColour}"; echo -e "$encode" | xclip -sel clip
 	elif [ $code == "url" ]; then
-		which urlencode
+		which urlencode > /dev/null 2>&1
 		if [ $(echo $?) == 0 ]; then
 			mainScript
 			encode=$(urlencode -m "$shell")
@@ -140,7 +140,7 @@ function encoding(){
 			fi
 		fi
 	elif [ $code == "url2" ]; then
-		which urlencode
+		which urlencode > /dev/null 2>&1
 		if [ $(echo $?) == 0 ]; then
 			mainScript
 			encode=$(urlencode "$shell")
